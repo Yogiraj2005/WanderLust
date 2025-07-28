@@ -28,8 +28,20 @@ main().then(() => {
     console.log(err);
 });
 
+// async function main() {
+//   await mongoose.connect('mongodb://127.0.0.1:27017/wanderLust');
+// }
+
 async function main() {
-    await mongoose.connect(dbUrl);
+    // await mongoose.connect(dbUrl);
+
+    await mongoose.connect(dbUrl, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+       
+
+    });
+
 }
 
 app.set("view engine", "ejs");
@@ -70,15 +82,20 @@ app.use(flash());
 
 app.use(passport.initialize());
 app.use(passport.session());
+
 passport.use(new LocalStrategy(User.authenticate()));
 
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
+    console.log("currUser:", req.user);
+    console.log("success flash:", req.flash("success"));
+    console.log("error flash:", req.flash("error"));
+    res.locals.currUser = req.user;
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
-    res.locals.currUser = req.user;
+    
     next();
 });
 
