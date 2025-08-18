@@ -19,6 +19,7 @@ const User = require("./models/user.js");
 const listingRouter = require("./routes/listing.js");
 const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
+const { error } = require('console');
 
 const dbUrl = process.env.ATLASDB_URL;
 
@@ -28,9 +29,9 @@ main().then(() => {
     console.log(err);
 });
 
-// async function main() {
-//   await mongoose.connect('mongodb://127.0.0.1:27017/wanderLust');
-// }
+async function main() {
+  await mongoose.connect('mongodb://127.0.0.1:27017/wanderLust');
+}
 
 async function main() {
     // await mongoose.connect(dbUrl);
@@ -59,9 +60,9 @@ const store = MongoStore.create({
     touchAfter: 24 * 3600,
 });
 
-store.on("error", () => {
-    console.log("ERROR IN MONGO SESSION STORE", err);
-})
+store.on("error", (error) => {
+    console.log("ERROR IN MONGO SESSION STORE", error);
+});
 
 const sessionOptions = {
     store,
@@ -89,13 +90,14 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 app.use((req, res, next) => {
-    console.log("currUser:", req.user);
-    console.log("success flash:", req.flash("success"));
-    console.log("error flash:", req.flash("error"));
-    res.locals.currUser = req.user;
+     res.locals.currUser = req.user;
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     
+    console.log("currUser:", req.user);
+    console.log("success flash:", req.flash("success"));
+    console.log("error flash:", req.flash("error"));
+   
     next();
 });
 
